@@ -47,7 +47,7 @@
 <summary>Deploy To Heroku</summary>
 <p>
 <br>
-<a href="https://heroku.com/deploy?template=https://github.com/JishuDeveloper/File-Sharing-Bot">
+<a href="https://heroku.com/deploy?template=https://github.com/Gokukhan1/Blacky_shareing">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
 </p>
