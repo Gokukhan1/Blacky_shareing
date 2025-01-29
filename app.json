@@ -8,12 +8,12 @@
   "env": {
       "API_ID": {
           "description": "Your APP ID From my.telegram.org ",
-          "value": "",
+          "value": "22731333",
           "required": true
       },
       "API_HASH": {
           "description": "Your API Hash From my.telegram.org ",
-          "value": "",
+          "value": "f8f993acb1d5f51c950ba873404d9af5",
           "required": true
       },
       "BOT_TOKEN": {
@@ -33,7 +33,22 @@
       },
       "FORCE_SUB_CHANNEL": {
         "description": "id of the channel or group, if you want enable force sub feature else put 0",
-        "value": "0",
+        "value": "-1002477751084",
+        "required": false
+      },
+      "FORCE_SUB_CHANNEL2": {
+        "description": "id of the channel or group, if you want enable force sub feature else put 0",
+        "value": "-1002310469639",
+        "required": false
+      },
+      "FORCE_SUB_CHANNEL3": {
+        "description": "id of the channel or group, if you want enable force sub feature else put 0",
+        "value": "-1002267038643",
+        "required": false
+      },
+      "FORCE_SUB_CHANNEL4": {
+        "description": "id of the channel or group, if you want enable force sub feature else put 0",
+        "value": "-1002434476782",
         "required": false
       },
       "DB_URL": {
@@ -58,7 +73,7 @@
       },
       "ADMINS": {
         "description": "A space separated list of user_ids of Admins, they can only create links",
-        "value": "",
+        "value": "7668725569",
         "required": false
       },
       "PROTECT_CONTENT": {
