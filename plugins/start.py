@@ -16,6 +16,7 @@ file_auto_delete = humanize.naturaldelta(jishudeveloper)
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+# Channels List
 MUST_JOIN = [
     "-1002434476782",
     "-1002267038643",
@@ -30,12 +31,11 @@ CHANNEL_LINKS = [
     "https://t.me/+brbDvzxpubxkM2Zl"
 ]
 
-async def must_join_channel(app: Client, msg):
+async def must_join_channel(app: Client, msg, is_retry=False):
     user = msg.from_user
-    mention = f"@{user.username}" if user.username else f"[{user.first_name}](tg://user?id={user.id})"
-    
-    missing_channels = []
+    mention = f"<a href='tg://user?id={user.id}'>{user.first_name}</a>"
 
+    missing_channels = []
     for i, channel_id in enumerate(MUST_JOIN):
         try:
             await app.get_chat_member(channel_id, user.id)
@@ -50,26 +50,36 @@ async def must_join_channel(app: Client, msg):
     buttons = [
         [InlineKeyboardButton("Join Channel 1", url=CHANNEL_LINKS[0]), InlineKeyboardButton("Join Channel 2", url=CHANNEL_LINKS[1])],
         [InlineKeyboardButton("Join Channel 3", url=CHANNEL_LINKS[2]), InlineKeyboardButton("Join Channel 4", url=CHANNEL_LINKS[3])],
-        [InlineKeyboardButton("🔄 Try Again", url=f"https://t.me/heavens_filebot?start=start")]
+        [InlineKeyboardButton("🔄 Try Again", callback_data="check_membership")]
     ]
 
     if missing_channels:
-        await msg.reply(
-            text,
-            reply_markup=InlineKeyboardMarkup(buttons),
-            disable_web_page_preview=True
-        )
+        if is_retry:
+            await msg.edit_text(
+                text,
+                reply_markup=InlineKeyboardMarkup(buttons),
+                disable_web_page_preview=True,
+                parse_mode=enums.ParseMode.HTML 
+            )
+        else:
+            await msg.reply(
+                text,
+                reply_markup=InlineKeyboardMarkup(buttons),
+                disable_web_page_preview=True,
+                parse_mode=enums.ParseMode.HTML
+            )
         return False
     
     return True
 
 @Client.on_callback_query(filters.regex("check_membership"))
 async def retry_check(client, callback_query):
-    user = callback_query.from_user
-    mention = f"@{user.username}" if user.username else f"[{user.first_name}](tg://user?id={user.id})"
-
-    if await must_join_channel(client, callback_query.message):
-        await callback_query.message.edit(f"✅ Thank you for joining, {mention}!", disable_web_page_preview=True)
+    if await must_join_channel(client, callback_query.message, is_retry=True):
+        await callback_query.message.edit_text(
+            "✅ Thank you for joining!",
+            disable_web_page_preview=True,
+            parse_mode=enums.ParseMode.HTML
+        )
 
 
 
