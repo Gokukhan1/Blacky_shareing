@@ -51,8 +51,12 @@ async def must_join_channel(app: Client, msg, is_retry=False):
     buttons = [
         [InlineKeyboardButton("Join Channel 1", url=CHANNEL_LINKS[0]), InlineKeyboardButton("Join Channel 2", url=CHANNEL_LINKS[1])],
         [InlineKeyboardButton("Join Channel 3", url=CHANNEL_LINKS[2]), InlineKeyboardButton("Join Channel 4", url=CHANNEL_LINKS[3])],
-        [InlineKeyboardButton("🔄 Try Again", url=f"https://t.me/heavens_filebot?start={msg.command[1]}")]
     ]
+
+    # Try Again button with proper handling
+    start_param = msg.command[1] if len(msg.command) > 1 else ""
+    try_again_url = f"https://t.me/heavens_filebot?start={start_param}" if start_param else "https://t.me/heavens_filebot"
+    buttons.append([InlineKeyboardButton("🔄 Try Again", url=try_again_url)])
 
     if missing_channels:
         if is_retry:
@@ -72,17 +76,6 @@ async def must_join_channel(app: Client, msg, is_retry=False):
         return False
     
     return True
-
-@Client.on_callback_query(filters.regex("check_membership"))
-async def retry_check(client, callback_query):
-    if await must_join_channel(client, callback_query.message, is_retry=True):
-        await callback_query.message.edit_text(
-            "✅ Thank you for joining!",
-            disable_web_page_preview=True,
-            parse_mode=enums.ParseMode.HTML
-        )
-
-
 
 
 @Bot.on_message(filters.command('start') & filters.private)
