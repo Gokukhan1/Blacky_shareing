@@ -194,7 +194,7 @@ async def not_joined(client: Client, message: Message):
             InlineKeyboardButton(text="ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ •", url=client.invitelink2),
         ])
     # Check if only the first channel is set
-    elif FORCE_SUB_CHANNEL1:
+    elif FORCE_SUB_CHANNEL:
         buttons.append([
             InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ•", url=client.invitelink1)
         ])
