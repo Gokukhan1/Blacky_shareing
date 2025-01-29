@@ -51,7 +51,7 @@ async def must_join_channel(app: Client, msg):
 
     # **Buttons (Always 4 Buttons)**
     buttons = [[InlineKeyboardButton(f"Join Channel {i+1}", url=CHANNEL_LINKS[i])] for i in range(4)]
-    buttons.append([InlineKeyboardButton("🔄 Try Again", callback_data="check_membership")])
+    buttons.append([InlineKeyboardButton("🔄 Try Again", url=f"https://t.me/heavens_filebot?start=start")])
 
     # **If any channel is missing, ask user to join**
     if missing_channels:
