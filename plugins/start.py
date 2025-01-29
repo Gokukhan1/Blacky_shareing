@@ -43,7 +43,7 @@ async def must_join_channel(app: Client, msg):
     if missing_channels:
         # **Dynamic Button Creation**
         buttons = [[InlineKeyboardButton(f"Join Channel {i+1}", url=channel[1])] for i, channel in enumerate(missing_channels)]
-        buttons.append([InlineKeyboardButton("🔄 Try Again", url=f"https://t.me/{client.username}?start={message.command[1]}")])
+        buttons.append([InlineKeyboardButton("🔄 Try Again", url=f"https://t.me/{Client.username}?start={message.command[1]}")])
 
         await msg.reply(
             "**You must join all channels to use this bot!**",
