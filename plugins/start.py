@@ -13,11 +13,9 @@ jishudeveloper = madflixofficials
 file_auto_delete = humanize.naturaldelta(jishudeveloper)
 
 
-
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Channels List
 MUST_JOIN = [
     "-1002434476782",
     "-1002267038643",
@@ -34,26 +32,27 @@ CHANNEL_LINKS = [
 
 async def must_join_channel(app: Client, msg):
     user = msg.from_user
-    mention = f"[{user.first_name}](tg://user?id={user.id})"
+    mention = f"@{user.username}" if user.username else f"[{user.first_name}](tg://user?id={user.id})"
     
     missing_channels = []
-    
+
     for i, channel_id in enumerate(MUST_JOIN):
         try:
             await app.get_chat_member(channel_id, user.id)
         except Exception:
             missing_channels.append((channel_id, CHANNEL_LINKS[i]))
 
-    # **Message with mention**
     text = f"Hello {mention}\n\n" \
            "You Need To Join in My Channel To Use Me\n\n" \
            "Kindly Please Join Channel"
 
-    # **Buttons (Always 4 Buttons)**
-    buttons = [[InlineKeyboardButton(f"Join Channel {i+1}", url=CHANNEL_LINKS[i])] for i in range(4)]
-    buttons.append([InlineKeyboardButton("🔄 Try Again", url=f"https://t.me/heavens_filebot?start=start")])
+    # **Buttons (2 per row)**
+    buttons = [
+        [InlineKeyboardButton("Join Channel 1", url=CHANNEL_LINKS[0]), InlineKeyboardButton("Join Channel 2", url=CHANNEL_LINKS[1])],
+        [InlineKeyboardButton("Join Channel 3", url=CHANNEL_LINKS[2]), InlineKeyboardButton("Join Channel 4", url=CHANNEL_LINKS[3])],
+        [InlineKeyboardButton("🔄 Try Again", callback_data="check_membership")]
+    ]
 
-    # **If any channel is missing, ask user to join**
     if missing_channels:
         await msg.reply(
             text,
@@ -67,7 +66,7 @@ async def must_join_channel(app: Client, msg):
 @Client.on_callback_query(filters.regex("check_membership"))
 async def retry_check(client, callback_query):
     user = callback_query.from_user
-    mention = f"[{user.first_name}](tg://user?id={user.id})"
+    mention = f"@{user.username}" if user.username else f"[{user.first_name}](tg://user?id={user.id})"
 
     if await must_join_channel(client, callback_query.message):
         await callback_query.message.edit(f"✅ Thank you for joining, {mention}!", disable_web_page_preview=True)
