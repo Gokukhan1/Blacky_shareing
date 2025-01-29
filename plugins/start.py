@@ -13,6 +13,10 @@ jishudeveloper = madflixofficials
 file_auto_delete = humanize.naturaldelta(jishudeveloper)
 
 
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# Channels List
 MUST_JOIN = [
     "-1002434476782",
     "-1002267038643",
@@ -32,21 +36,14 @@ async def must_join_channel(app: Client, msg):
 
     for i, channel_id in enumerate(MUST_JOIN):
         try:
-            # Check if user is a member
             await app.get_chat_member(channel_id, msg.from_user.id)
         except Exception:
-            # If not a member, add to missing list
             missing_channels.append((channel_id, CHANNEL_LINKS[i]))
 
     if missing_channels:
-        # Create join buttons
-        buttons = [
-            [InlineKeyboardButton("Join Channel 1", url=missing_channels[0][1]), 
-             InlineKeyboardButton("Join Channel 2", url=missing_channels[1][1])],
-            [InlineKeyboardButton("Join Channel 3", url=missing_channels[2][1]), 
-             InlineKeyboardButton("Join Channel 4", url=missing_channels[3][1])],
-            [InlineKeyboardButton("🔄 Try Again", callback_data="check_membership")]
-        ]
+        # **Dynamic Button Creation**
+        buttons = [[InlineKeyboardButton(f"Join Channel {i+1}", url=channel[1])] for i, channel in enumerate(missing_channels)]
+        buttons.append([InlineKeyboardButton("🔄 Try Again", callback_data="check_membership")])
 
         await msg.reply(
             "**You must join all channels to use this bot!**",
@@ -61,6 +58,7 @@ async def must_join_channel(app: Client, msg):
 async def retry_check(client, callback_query):
     await callback_query.message.delete()
     await must_join_channel(client, callback_query.message)
+
 
 
 
@@ -185,53 +183,9 @@ async def start_command(client: Client, message: Message):
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
     # Initialize buttons list
-    buttons = []
-
-    # Check if the first and second channels are both set
-    if FORCE_SUB_CHANNEL and FORCE_SUB_CHANNEL2:
-        buttons.append([
-            InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ", url=client.invitelink1),
-            InlineKeyboardButton(text="ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ •", url=client.invitelink2),
-        ])
-    # Check if only the first channel is set
-    elif FORCE_SUB_CHANNEL:
-        buttons.append([
-            InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ•", url=client.invitelink1)
-        ])
-    # Check if only the second channel is set
-    elif FORCE_SUB_CHANNEL2:
-        buttons.append([
-            InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ•", url=client.invitelink2)
-        ])
-
-    # Check if the third and fourth channels are set
-    if FORCE_SUB_CHANNEL3 and FORCE_SUB_CHANNEL4:
-        buttons.append([
-            InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ", url=client.invitelink3),
-            InlineKeyboardButton(text="ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ •", url=client.invitelink4),
-        ])
-    # Check if only the first channel is set
-    elif FORCE_SUB_CHANNEL3:
-        buttons.append([
-            InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ•", url=client.invitelink3)
-        ])
-    # Check if only the second channel is set
-    elif FORCE_SUB_CHANNEL4:
-        buttons.append([
-            InlineKeyboardButton(text="• ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ•", url=client.invitelink4)
-        ])
-
-    # Append "Try Again" button if the command has a second argument
-    try:
-        buttons.append([
-            InlineKeyboardButton(
-                text="ʀᴇʟᴏᴀᴅ",
-                url=f"https://t.me/{client.username}?start={message.command[1]}"
-            )
-        ])
-    except IndexError:
-        pass  
-        
+    if not await must_join_channel(client, message):
+        return
+  
     await message.reply(
         text = FORCE_MSG.format(
                 first = message.from_user.first_name,
