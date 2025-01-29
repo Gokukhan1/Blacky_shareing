@@ -13,12 +13,63 @@ jishudeveloper = madflixofficials
 file_auto_delete = humanize.naturaldelta(jishudeveloper)
 
 
+MUST_JOIN = [
+    "-1002434476782",
+    "-1002267038643",
+    "-1002310469639",
+    "-1002477751084"
+]
+
+CHANNEL_LINKS = [
+    "https://t.me/Anime_Heavens_backup",
+    "https://t.me/+LTk5tew-i41lNzM1",
+    "https://t.me/Hentai_Heavens_backup",
+    "https://t.me/+brbDvzxpubxkM2Zl"
+]
+
+async def must_join_channel(app: Client, msg):
+    missing_channels = []
+
+    for i, channel_id in enumerate(MUST_JOIN):
+        try:
+            # Check if user is a member
+            await app.get_chat_member(channel_id, msg.from_user.id)
+        except Exception:
+            # If not a member, add to missing list
+            missing_channels.append((channel_id, CHANNEL_LINKS[i]))
+
+    if missing_channels:
+        # Create join buttons
+        buttons = [
+            [InlineKeyboardButton("Join Channel 1", url=missing_channels[0][1]), 
+             InlineKeyboardButton("Join Channel 2", url=missing_channels[1][1])],
+            [InlineKeyboardButton("Join Channel 3", url=missing_channels[2][1]), 
+             InlineKeyboardButton("Join Channel 4", url=missing_channels[3][1])],
+            [InlineKeyboardButton("🔄 Try Again", callback_data="check_membership")]
+        ]
+
+        await msg.reply(
+            "**You must join all channels to use this bot!**",
+            reply_markup=InlineKeyboardMarkup(buttons),
+            disable_web_page_preview=True
+        )
+        return False
+    
+    return True
+
+@Client.on_callback_query(filters.regex("check_membership"))
+async def retry_check(client, callback_query):
+    await callback_query.message.delete()
+    await must_join_channel(client, callback_query.message)
 
 
 
-@Bot.on_message(filters.command('start') & filters.private & subscribed)
+@Bot.on_message(filters.command('start') & filters.private)
 async def start_command(client: Client, message: Message):
     id = message.from_user.id
+    if not await must_join_channel(client, message):
+        return
+        
     if not await present_user(id):
         try:
             await add_user(id)
